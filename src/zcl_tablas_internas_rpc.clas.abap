@@ -59,61 +59,140 @@ CLASS zcl_tablas_internas_rpc IMPLEMENTATION.
     """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
     "APUNTES CLASE
     """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-    " TABLAS INTERNAS "
 
-    TYPES:BEGIN OF ty_cliente,
+
+    "1. Tablas internas STANDARD"
+    """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+    TYPES:BEGIN OF ty_empleado,
             nombre   TYPE string,
-            id       TYPE i,
             edad     TYPE i,
             telefono TYPE string,
             correo   TYPE string,
-          END OF ty_cliente.
+          END OF ty_empleado.
 
-    DATA ls_cliente TYPE ty_cliente.
-    DATA lt_cliente TYPE TABLE OF ty_cliente.
-
-    ls_cliente-nombre = 'Rebeca'.
-    ls_cliente-id = '009'.
-    ls_cliente-edad = 23.
-    ls_cliente-telefono = '123456789'.
-    ls_cliente-correo = 'rebeca@gmail.com'.
-
-    INSERT ls_cliente INTO lt_cliente INDEX 1.
-
-    ls_cliente-nombre = 'María'.
-    ls_cliente-id = '010'.
-    ls_cliente-edad = 23.
-    ls_cliente-telefono = '123456789'.
-    ls_cliente-correo = 'maria@gmail.com'.
-
-    INSERT ls_cliente INTO lt_cliente INDEX 2.
-
-    INSERT VALUE #(
-        nombre = 'Laura'
-        edad = 51
-        id = 003
-        telefono = '987654321'
-        correo = 'laura@gmail.com'
-    ) INTO TABLE lt_cliente. "Podría añadir index
-
-    "Linea en blanco: insert initial line into table lt_cliente
-    "    out->write( lt_cliente ).
-
-    "Copiado de tablas (no se suele hacer)
-    DATA lt_cliente2 LIKE lt_cliente.
-
-    "Duplicidad de contenido
-    "    insert lines of lt_cliente into table lt_cliente2.
-
-    "Duplicidad hasta X registro
-    "    insert lines of lt_cliente to 1 into table lt_cliente2.
-
-    "Duplicidad de X registros
-    INSERT LINES OF lt_cliente FROM 1 TO 2 INTO TABLE lt_cliente2.
-
-    out->write( lt_cliente2 ).
+    DATA ls_empleado TYPE ty_empleado.
+    "1.1 A menos que se indique el tipo de tabla, será estándar
+    "por defecto
+    """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+    DATA lt_empleado TYPE STANDARD TABLE OF ty_empleado.
+    DATA lt_empleado2 TYPE TABLE OF ty_empleado.
 
 
+    "2. Tablas internas SORTED - uso para acceder a la info
+    "Puede ser UNIQUE y NON-UNIQUE
+    """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+    DATA lt_empleado_sorted TYPE SORTED TABLE OF ty_empleado WITH UNIQUE KEY correo.
+
+
+    "3. Tablas internas HASH - búsqueda rápida de información
+    "Solo puede ser UNIQUE
+    """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+    DATA lt_empleado_hashed TYPE HASHED TABLE OF  ty_empleado WITH UNIQUE KEY correo.
+
+
+    "4. Inserción de elemento
+    """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+    ls_empleado-nombre = 'Rebeca'.
+    ls_empleado-edad = 23.
+    ls_empleado-telefono = '123456789'.
+    ls_empleado-correo = 'rebeca@gmail.com'.
+
+    INSERT ls_empleado INTO lt_empleado INDEX 1.
+
+
+    "5. Modificar los valores para introducirlos en un nuevo índice
+    """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+    ls_empleado-nombre = 'María'.
+    ls_empleado-edad = 48.
+    ls_empleado-telefono = '123456789'.
+    ls_empleado-correo = 'maria@gmail.com'.
+
+    INSERT ls_empleado INTO lt_empleado INDEX 2.
+
+
+    "6.Si volviera a insertar en INDEX 2, el resto de la tabla se
+    "desplaza hacia abajo
+    """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+    ls_empleado-nombre = 'Carlos'.
+    ls_empleado-edad = 21.
+    ls_empleado-telefono = '123456789'.
+    ls_empleado-correo = 'carlos@gmail.com'.
+
+    INSERT ls_empleado INTO lt_empleado INDEX 2.
+
+
+    "7.Si no indicas el INDEX se añade en la siguiente línea vacía
+    """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+    ls_empleado-nombre = 'Javier'.
+    ls_empleado-edad = 58.
+    ls_empleado-telefono = '123456789'.
+    ls_empleado-correo = 'javier@gmail.com'.
+
+    INSERT ls_empleado INTO TABLE lt_empleado.
+
+
+    "8.LOOP AT
+    """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+    LOOP AT lt_empleado INTO ls_empleado.
+      out->write( |Nombre: {  ls_empleado-nombre }, edad: { ls_empleado-edad } | ).
+    ENDLOOP.
+
+
+    "9.Operaciones con tablas
+    """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+*        "Linea en blanco: insert initial line into table lt_cliente
+*        out->write( lt_cliente ).
+*
+*        "Copiado de tablas (no se suele hacer)
+*        DATA lt_cliente2 LIKE lt_cliente.
+*
+*        "Duplicidad de contenido
+*        INSERT LINES OF lt_cliente INTO TABLE lt_cliente2.
+*
+*        "Duplicidad hasta X registro
+*        INSERT LINES OF lt_cliente TO 1 INTO TABLE lt_cliente2.
+*
+*        "Duplicidad de X registros
+*        INSERT LINES OF lt_cliente FROM 1 TO 2 INTO TABLE lt_cliente2.
+*
+*        out->write( lt_cliente2 ).
+
+
+    "10.Ejercicio - Filtrado e ID automático
+    """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+    ls_empleado = VALUE #( nombre = 'Mario' edad = 23 telefono = '+34111223344' correo = 'mario@gmail.com' ).
+    INSERT ls_empleado INTO TABLE lt_empleado.
+
+    ls_empleado = VALUE #( nombre = 'Celia' edad = 30 telefono = '+34111223344' correo = 'celia@gmail.com' ).
+    INSERT ls_empleado INTO TABLE lt_empleado.
+
+    ls_empleado = VALUE #( nombre = 'Inma' edad = 54 telefono = '+34111223344' correo = 'inmaculada@gmail.com' ).
+    INSERT ls_empleado INTO TABLE lt_empleado.
+
+    ls_empleado = VALUE #( nombre = 'Gabriel' edad = 23 telefono = '+34111223344' correo = 'celia@gmail.com' ).
+    INSERT ls_empleado INTO TABLE lt_empleado.
+
+    out->write( |{ cl_abap_char_utilities=>cr_lf }| ).
+    out->write( |Ejercicio filtro| ).
+
+    TYPES:BEGIN OF ty_empleado_filtro,
+            id     TYPE i,
+            nombre TYPE string,
+            edad   TYPE i,
+          END OF ty_empleado_filtro.
+
+    DATA lt_empleado_filtro TYPE TABLE OF ty_empleado_filtro.
+    DATA lv_cont TYPE i VALUE 1.
+
+    LOOP AT lt_empleado INTO ls_empleado.
+      IF ls_empleado-edad = 23.
+        INSERT VALUE #( id = lv_cont nombre = ls_empleado-nombre edad = ls_empleado-edad ) INTO TABLE lt_empleado_filtro.
+        lv_cont += 1.
+      ENDIF.
+    ENDLOOP.
+
+    out->write( lt_empleado_filtro ).
 
   ENDMETHOD.
 ENDCLASS.
