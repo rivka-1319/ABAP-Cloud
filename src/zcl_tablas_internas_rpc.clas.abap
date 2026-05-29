@@ -81,7 +81,7 @@ CLASS zcl_tablas_internas_rpc IMPLEMENTATION.
 
     DATA ls_empleado TYPE ty_empleado.
 
-    "1.1 A menos que se indique el tipo de tabla, será estándar
+    "1 A menos que se indique el tipo de tabla, será estándar
     "por defecto
     """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
     DATA lt_empleado TYPE STANDARD TABLE OF ty_empleado.

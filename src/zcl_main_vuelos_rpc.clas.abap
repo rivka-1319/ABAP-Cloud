@@ -10,9 +10,10 @@ CLASS zcl_main_vuelos_rpc DEFINITION
 ENDCLASS.
 
 
-
 CLASS zcl_main_vuelos_rpc IMPLEMENTATION.
   METHOD if_oo_adt_classrun~main.
+
+    "If x is bound
 
     DATA lt_pasajeros TYPE STANDARD TABLE OF REF TO zcl_pasajero_rpc.
     DATA(lo_vuelos) = NEW zcl_gestor_vuelos_rpc( ).
@@ -99,7 +100,7 @@ CLASS zcl_main_vuelos_rpc IMPLEMENTATION.
       IF lv_desc = 0.
         out->write( |Precio final: { lv_precio } | ).
       ELSE.
-      lv_desc = lv_desc / 100 * lv_precio.
+        lv_desc = lv_desc / 100 * lv_precio.
         out->write( |Precio final: { lv_desc DECIMALS = 2 } USD| ).
       ENDIF.
 
